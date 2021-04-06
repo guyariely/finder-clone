@@ -1,0 +1,10 @@
+.favorites-folder {
+  color: var(--color-text-soft);
+  font-size: 14px;
+  padding: 1.5px 12px;
+}
+
+.favorites-folder.active {
+  background: #0000001f;
+  color: var(--color-text);
+}

@@ -5,22 +5,11 @@
   backdrop-filter: blur(200px);
   border-top: var(--border-width) solid var(--color-border);
   border-bottom: var(--border-width) solid var(--color-border);
+}
 
-  .favorites {
-    margin: 0px;
-    color: var(--color-text-light);
-    padding: 8px 10px 4px 10px;
-    font-weight: 500;
-  }
-
-  .favorites-folder {
-    color: var(--color-text-soft);
-    font-size: 14px;
-    padding: 1.5px 12px;
-  }
-
-  .favorites-folder.active {
-    background: #0000001f;
-    color: var(--color-text);
-  }
+.favorites {
+  margin: 0px;
+  color: var(--color-text-light);
+  padding: 8px 10px 4px 10px;
+  font-weight: 500;
 }

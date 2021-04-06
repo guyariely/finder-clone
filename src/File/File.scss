@@ -1,0 +1,48 @@
+.file {
+  font-size: 7px;
+  color: var(--color-text-light);
+
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  grid-gap: 7px;
+
+  .name {
+    justify-self: center;
+    font-size: 12px;
+  }
+
+  &.active {
+    .icon-wrapper {
+      background: #e6e6e6;
+    }
+
+    .name {
+      color: var(--color-background);
+      background: var(--color-primary-bolder);
+      padding: 2px 4px;
+      border-radius: var(--button-border-radius);
+    }
+  }
+}
+
+.icon-wrapper {
+  border-radius: var(--button-border-radius);
+  padding: 10px 2px 5px 2px;
+}
+
+.icon {
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 75px;
+  height: 65px;
+}
+
+.folder.icon {
+  background-image: url(./folder.png);
+}
+
+.textfile.icon {
+  background-image: url(./textfile.png);
+  margin-left: 10px;
+}

@@ -1,0 +1,23 @@
+.icons-size-slider {
+  appearance: none;
+  height: 5px;
+  border-radius: 30px;
+  background: var(--color-border);
+  overflow: hidden;
+  width: 80px;
+
+  &::-webkit-slider-runnable-track {
+    -webkit-appearance: none;
+    height: 5px;
+  }
+
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    background: var(--button-background);
+    border-radius: 50%;
+    height: 5px;
+    width: 5px;
+    cursor: pointer;
+    box-shadow: -202px 0 0 200px var(--color-primary-bold);
+  }
+}

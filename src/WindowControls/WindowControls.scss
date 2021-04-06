@@ -1,0 +1,28 @@
+.window-controls {
+  display: flex;
+  align-items: center;
+}
+
+.window-control {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 7px;
+}
+
+@mixin window-control-button($color) {
+  background: var(--color-button-#{$color});
+  border: 1px solid var(--color-button-light-#{$color});
+}
+
+.window-control.close-window {
+  @include window-control-button(red);
+}
+
+.window-control.minimize-window {
+  @include window-control-button(yellow);
+}
+
+.window-control.maximize-window {
+  @include window-control-button(green);
+}

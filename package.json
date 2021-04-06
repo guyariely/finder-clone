@@ -35,5 +35,11 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "devDependencies": {
+    "create-react-component-folder": "^0.3.7"
+  },
+  "crcf": [
+    "scss"
+  ]
 }

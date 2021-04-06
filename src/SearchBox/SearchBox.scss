@@ -1,0 +1,13 @@
+@import "../styles/utils.scss";
+
+.search-box {
+  @extend %menu-bar-button;
+  color: var(--color-text);
+  border: none;
+  padding: 0 8px;
+  font-size: 12px;
+
+  &:placeholder {
+    color: var(--color-text-lighter);
+  }
+}
