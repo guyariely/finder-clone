@@ -1,13 +1,60 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+:root {
+  --color-background: white;
+  --color-shadow: #6f6f6f;
+  --color-primary: #7ad3fa;
+  --color-primary-bold: #3c88fd;
+  --color-primary-bolder: #0263e1;
+
+  --color-button-green: #29c93f;
+  --color-button-light-green: rgb(3 105 3 / 10%);
+  --color-button-yellow: #ffbd2d;
+  --color-button-light-yellow: rgb(195 131 19 / 10%);
+  --color-button-red: #ff6058;
+  --color-button-light-red: rgb(105 11 10 / 10%);
+  --color-text: black;
+  --color-text-soft: #2b2b2b;
+  --color-text-light: #4c4c4c;
+  --color-text-lighter: #929292;
+  --color-border: #a9a9a9;
+  --color-gradient-background: linear-gradient(
+    360deg,
+    #dee1e1 10%,
+    #f4f4f4 360%
+  );
+
+  --button-shadow: 0 0 0.3px 0.3px #b2b2b2;
+  --border-width: 0.5px;
+  --button-height: 23px;
+  --button-background: #f6f6f6;
+  --button-border-radius: 3px;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+button:focus,
+.icons-size-slider:focus {
+  outline: 0;
+}
+
+html,
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+p {
+  margin: 0;
 }

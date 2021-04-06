@@ -1,0 +1,23 @@
+#window {
+  display: grid;
+  font-family: "Roboto", sans-serif;
+  background-image: url(./mojave-wallpaper.jpg);
+  background-size: cover;
+  background-repeat: no-repeat;
+  grid-template-columns: 1fr 3fr 1fr;
+  grid-template-rows: 1fr 6fr 1fr;
+  height: 100%;
+  margin: 0;
+  letter-spacing: 0.01px;
+}
+
+#finder {
+  display: grid;
+  grid-template-rows: 58px auto 25px;
+  grid-template-columns: 155px minmax(150px, auto);
+  grid-column: 2 / 3;
+  grid-row: 2 / 3;
+  border-radius: 4px;
+  box-shadow: 0px 0px 20px 0px var(--color-shadow);
+  overflow: hidden;
+}
