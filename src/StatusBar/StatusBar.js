@@ -1,11 +1,17 @@
 import IconSizeSlider from "../IconSizeSlider/IconSizeSlider";
 import "./StatusBar.scss";
+import { getRandom } from "../utils/utils";
 
-function StatusBar() {
+function StatusBar({ filesCount, textFilesCount }) {
+  const randomSize = getRandom(0.15, 3);
+  const sizeTotal = Math.round(textFilesCount * randomSize * 100) / 100;
+
   return (
     <footer id="status-bar">
       <span className="ghost-flex-item"></span>
-      <p className="finder-details">8 items, 6.54 GB available</p>
+      <p className="finder-details">
+        {filesCount} items, {sizeTotal} MB total
+      </p>
       <IconSizeSlider />
     </footer>
   );

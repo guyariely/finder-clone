@@ -5,6 +5,7 @@ import Files from "../Files/Files";
 import StatusBar from "../StatusBar/StatusBar";
 import "./App.scss";
 import "./mojave-wallpaper.jpg";
+import { last } from "../utils/utils";
 
 import { files } from "../dummy_files_object";
 
@@ -30,7 +31,7 @@ class App extends Component {
   navigateToFolder(name) {
     this.setState(state => {
       const { backwardHistory } = state;
-      const currentFolder = backwardHistory[backwardHistory.length - 1];
+      const currentFolder = last(backwardHistory);
       return {
         backwardHistory: [...backwardHistory, currentFolder[name].files],
         forwardHistory: [],
@@ -43,10 +44,7 @@ class App extends Component {
       const { backwardHistory, forwardHistory } = state;
       return {
         backwardHistory: backwardHistory.slice(0, backwardHistory.length - 1),
-        forwardHistory: [
-          ...forwardHistory,
-          backwardHistory[backwardHistory.length - 1],
-        ],
+        forwardHistory: [...forwardHistory, last(backwardHistory)],
       };
     });
   }
@@ -56,10 +54,7 @@ class App extends Component {
       const { backwardHistory, forwardHistory } = state;
       return {
         forwardHistory: forwardHistory.slice(0, forwardHistory.length - 1),
-        backwardHistory: [
-          ...backwardHistory,
-          forwardHistory[forwardHistory.length - 1],
-        ],
+        backwardHistory: [...backwardHistory, last(forwardHistory)],
       };
     });
   }
@@ -78,12 +73,18 @@ class App extends Component {
           />
           <SideBar />
           <Files
-            files={
-              this.state.backwardHistory[this.state.backwardHistory.length - 1]
-            }
+            files={last(this.state.backwardHistory)}
             navigateToFolder={this.navigateToFolder}
           />
-          <StatusBar />
+          <StatusBar
+            filesCount={Object.keys(last(this.state.backwardHistory)).length}
+            textFilesCount={
+              Object.keys(last(this.state.backwardHistory)).filter(
+                fileName =>
+                  last(this.state.backwardHistory)[fileName].type === "textfile"
+              ).length
+            }
+          />
         </div>
       </div>
     );
