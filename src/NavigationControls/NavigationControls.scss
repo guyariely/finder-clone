@@ -12,16 +12,16 @@
   align-items: center;
   width: 24px;
   font-size: 11px;
-  opacity: 80%;
   font-weight: bold;
+  color: var(--color-text-light);
 
   &:hover {
     cursor: auto;
   }
 
-  &.active {
-    opacity: 100%;
-    color: var(--color-text-light);
+  &:disabled {
+    color: var(--color-text-lighter);
+    opacity: 80%;
   }
 }
 

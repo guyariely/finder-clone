@@ -1,0 +1,33 @@
+%menu-bar-button {
+  background: var(--button-background);
+  height: var(--button-height);
+  border-radius: var(--button-border-radius);
+  color: var(--color-text-lighter);
+  box-shadow: var(--button-shadow);
+}
+
+#menu-bar {
+  display: flex;
+  flex-direction: column;
+
+  grid-row: 1 / 2;
+  grid-column: 1 / 3;
+  background: var(--color-gradient-background);
+}
+
+.menu-bar-top {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  padding: 3px 7px;
+}
+
+.menu-bar-bottom {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 7px;
+}
+
+.username {
+  font-size: 13px;
+  color: var(--color-text-light);
+}

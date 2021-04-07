@@ -10,6 +10,8 @@
   .name {
     justify-self: center;
     font-size: 12px;
+    text-align: center;
+    pointer-event: none;
   }
 
   &.active {

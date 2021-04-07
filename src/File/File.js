@@ -2,9 +2,13 @@ import "./File.scss";
 import "./folder.png";
 import "./textfile.png";
 
-function File({ type, name }) {
+function File({ name, type, isActive, onClickFile }) {
   return (
-    <div className="file">
+    <div
+      name={name}
+      className={`${isActive ? "active" : ""} file`}
+      onClick={e => onClickFile(e, name)}
+    >
       <div className="icon-wrapper">
         <div className={`${type} icon`}></div>
       </div>
