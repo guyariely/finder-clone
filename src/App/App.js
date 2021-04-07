@@ -6,7 +6,7 @@ import StatusBar from "../StatusBar/StatusBar";
 import "./App.scss";
 import "./mojave-wallpaper.jpg";
 
-import { _files } from "../dummy_files_object";
+import { files } from "../dummy_files_object";
 
 class App extends Component {
   constructor(props) {
@@ -17,7 +17,7 @@ class App extends Component {
     this.navigateForward = this.navigateForward.bind(this);
     this.state = {
       searchInput: "",
-      backwardHistory: [_files],
+      backwardHistory: [files],
       forwardHistory: [],
     };
   }
