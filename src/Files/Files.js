@@ -7,6 +7,7 @@ class Files extends Component {
   constructor(props) {
     super(props);
     this.onClickFile = this.onClickFile.bind(this);
+    this.openNewFileDialog = this.openNewFileDialog.bind(this);
     this.state = {
       activeFile: "",
       lastClick: null,
@@ -48,6 +49,11 @@ class Files extends Component {
     }
   }
 
+  openNewFileDialog(type) {
+    this.setState({ showContextMenu: false });
+    this.props.openNewFileDialog(type);
+  }
+
   render() {
     const { files } = this.props;
 
@@ -61,6 +67,7 @@ class Files extends Component {
           <ContextMenu
             xPos={this.state.contextMenuPosition.x}
             yPos={this.state.contextMenuPosition.y}
+            openNewFileDialog={this.openNewFileDialog}
           />
         )}
         {Object.keys(files).map(fileName => (

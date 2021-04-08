@@ -1,0 +1,20 @@
+.dialog-overlay {
+  position: fixed;
+  inset: 0px;
+  background: none;
+}
+
+.dialog {
+  position: absolute;
+  border-radius: var(--button-border-radius);
+  border: var(--border-width) solid var(--color-border-light);
+  background: #ececec;
+  top: 50%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+  box-shadow: var(--modal-shadow);
+  outline: none;
+}
