@@ -70,15 +70,16 @@ class Files extends Component {
             openNewFileDialog={this.openNewFileDialog}
           />
         )}
-        {Object.keys(files).map(fileName => (
-          <File
-            isActive={fileName === this.state.activeFile}
-            onClickFile={this.onClickFile}
-            key={fileName}
-            name={fileName}
-            type={files[fileName].type}
-          />
-        ))}
+        {files &&
+          Object.keys(files).map(fileName => (
+            <File
+              isActive={fileName === this.state.activeFile}
+              onClickFile={this.onClickFile}
+              key={fileName}
+              name={fileName}
+              type={files[fileName].type}
+            />
+          ))}
       </main>
     );
   }

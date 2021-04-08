@@ -19,17 +19,21 @@ class App extends Component {
     this.navigateToFolder = this.navigateToFolder.bind(this);
     this.navigateBackward = this.navigateBackward.bind(this);
     this.navigateForward = this.navigateForward.bind(this);
-    this.createNewFolder = this.createNewFolder.bind(this);
-    this.createNewTextfile = this.createNewTextfile.bind(this);
     this.createNewFile = this.createNewFile.bind(this);
+    this.openNewFileDialog = this.openNewFileDialog.bind(this);
 
     this.state = {
       searchInput: "",
-      backwardHistory: [files],
+      backwardHistory: [],
       forwardHistory: [],
       modalIsOpen: false,
       modalFileType: "folder",
     };
+  }
+
+  componentDidMount() {
+    const files = JSON.parse(localStorage.getItem("files"));
+    this.setState({ backwardHistory: [files] });
   }
 
   onSearchInputChange(e) {
@@ -68,40 +72,68 @@ class App extends Component {
     });
   }
 
-  createNewFolder(name) {
-    const { backwardHistory } = this.state;
-    const currentFolder = last(backwardHistory);
-    currentFolder[name] = { type: "folder", files: {} };
-
-    this.setState({
-      backwardHistory: [
-        ...backwardHistory.slice(0, backwardHistory.length - 1),
-        currentFolder,
-      ],
-    });
-  }
-
-  createNewTextfile(name) {
-    const { backwardHistory } = this.state;
-    const currentFolder = last(backwardHistory);
-    currentFolder[name] = { type: "textfile" };
-
-    this.setState({
-      backwardHistory: [
-        ...backwardHistory.slice(0, backwardHistory.length - 1),
-        currentFolder,
-      ],
-    });
-  }
-
   createNewFile(name) {
-    this.state.modalFileType === "folder"
-      ? this.createNewFolder(name)
-      : this.createNewTextfile(name);
+    const { backwardHistory } = this.state;
+    const currentFolder = last(backwardHistory);
+
+    if (this.state.modalFileType === "folder") {
+      currentFolder[name] = { type: "folder", files: {} };
+    } else {
+      currentFolder[name] = { type: "textfile" };
+    }
+
+    this.setState({
+      backwardHistory: [
+        ...backwardHistory.slice(0, backwardHistory.length - 1),
+        currentFolder,
+      ],
+    });
+
     this.setState({ modalIsOpen: false });
+    localStorage.setItem(
+      "files",
+      JSON.stringify(this.state.backwardHistory[0])
+    );
+  }
+
+  getSearchedFiles(folder) {
+    let files = {};
+    for (const fileName in folder) {
+      if (
+        folder[fileName].type === "textfile" &&
+        fileName.toLowerCase().includes(this.state.searchInput.toLowerCase())
+      ) {
+        files[fileName] = folder[fileName];
+      } else {
+        files = { ...files, ...this.getSearchedFiles(folder[fileName].files) };
+      }
+    }
+    return files;
+  }
+
+  openNewFileDialog(type) {
+    // user should not be able to add files when searching files
+    if (!this.state.searchInput) {
+      this.setState({
+        modalIsOpen: true,
+        modalFileType: type,
+      });
+    }
   }
 
   render() {
+    const currentFolder = last(this.state.backwardHistory);
+    const files = this.state.searchInput
+      ? this.getSearchedFiles(currentFolder)
+      : currentFolder;
+
+    const filesNames = Object.keys(files || {});
+
+    const filesCount = filesNames.length;
+    const textfilesCount = filesNames.filter(
+      fileName => files[fileName].type === "textfile"
+    ).length;
+
     return (
       <div id="window">
         <NewFileDialog
@@ -121,21 +153,11 @@ class App extends Component {
           />
           <SideBar />
           <Files
-            files={last(this.state.backwardHistory)}
+            files={files}
             navigateToFolder={this.navigateToFolder}
-            openNewFileDialog={type =>
-              this.setState({ modalIsOpen: true, modalFileType: type })
-            }
+            openNewFileDialog={this.openNewFileDialog}
           />
-          <StatusBar
-            filesCount={Object.keys(last(this.state.backwardHistory)).length}
-            textFilesCount={
-              Object.keys(last(this.state.backwardHistory)).filter(
-                fileName =>
-                  last(this.state.backwardHistory)[fileName].type === "textfile"
-              ).length
-            }
-          />
+          <StatusBar filesCount={filesCount} textFilesCount={textfilesCount} />
         </div>
       </div>
     );
