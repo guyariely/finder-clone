@@ -1,0 +1,21 @@
+.context-menu-button-wrapper {
+  padding: 4px 0;
+  width: 100%;
+  border-bottom: 1.5px solid var(--color-border-light);
+}
+
+.context-menu-button {
+  color: var(--color-text-light);
+  width: 100%;
+  text-align: start;
+  padding: 4px 12px;
+
+  &:hover {
+    background: var(--color-primary-bold);
+    color: var(--color-background);
+  }
+}
+
+.context-menu-button-wrapper:last-child {
+  border-bottom: none;
+}

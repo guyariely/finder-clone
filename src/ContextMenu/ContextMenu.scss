@@ -1,0 +1,10 @@
+.context-menu {
+  position: absolute;
+  border-radius: 5px;
+  backdrop-filter: blur(500px);
+  border: var(--border-width) solid var(--color-border-light);
+  box-shadow: var(--modal-shadow);
+  background: var(--modal-background);
+  overflow: hidden;
+  width: 200px;
+}

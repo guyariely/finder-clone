@@ -1,6 +1,7 @@
 import { Component } from "react";
 import File from "../File/File";
 import "./Files.scss";
+import ContextMenu from "../ContextMenu/ContextMenu";
 
 class Files extends Component {
   constructor(props) {
@@ -9,12 +10,14 @@ class Files extends Component {
     this.state = {
       activeFile: "",
       lastClick: null,
+      showContextMenu: false,
+      contextMenuPosition: { x: null, y: null },
     };
   }
 
   onClickFile(e, name) {
     e.preventDefault();
-    this.setState({ activeFile: name });
+    this.setState({ activeFile: name, showContextMenu: false });
     // handle double click
     const { type } = this.props.files[name];
     if (type === "folder" && this.state.lastClick) {
@@ -28,11 +31,38 @@ class Files extends Component {
     this.setState({ lastClick: new Date().getTime() });
   }
 
+  onClickScreen(e) {
+    e.preventDefault();
+    if (e.target.id === "files") {
+      this.setState({ activeFile: "", showContextMenu: false });
+    }
+  }
+
+  onRightClickScreen(e) {
+    e.preventDefault();
+    if (e.target.id === "files") {
+      this.setState({
+        showContextMenu: true,
+        contextMenuPosition: { x: e.pageX, y: e.pageY },
+      });
+    }
+  }
+
   render() {
     const { files } = this.props;
 
     return (
-      <main id="files">
+      <main
+        id="files"
+        onClick={e => this.onClickScreen(e)}
+        onContextMenu={e => this.onRightClickScreen(e)}
+      >
+        {this.state.showContextMenu && (
+          <ContextMenu
+            xPos={this.state.contextMenuPosition.x}
+            yPos={this.state.contextMenuPosition.y}
+          />
+        )}
         {Object.keys(files).map(fileName => (
           <File
             isActive={fileName === this.state.activeFile}

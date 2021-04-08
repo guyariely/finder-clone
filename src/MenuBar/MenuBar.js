@@ -1,5 +1,4 @@
 import NavigationControls from "../NavigationControls/NavigationControls";
-import SettingsControls from "../SettingsControls/SettingsControls";
 import WindowControls from "../WindowControls/WindowControls";
 import SearchBox from "../SearchBox/SearchBox";
 import "./MenuBar.scss";
@@ -27,7 +26,6 @@ function MenuBar(props) {
           disableBackButton={disableBackButton}
           disableForwardButton={disableForwardButton}
         />
-        <SettingsControls />
         <SearchBox
           searchInput={searchInput}
           onSearchInputChange={onSearchInputChange}
