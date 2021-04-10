@@ -2,8 +2,8 @@
   display: grid;
   grid-column-gap: 10px;
   grid-row-gap: 40px;
-  grid-template-columns: repeat(auto-fill, 75px);
-  grid-auto-rows: 75px;
+  grid-template-columns: repeat(auto-fill, var(--icon-size));
+  grid-auto-rows: var(--icon-size);
   justify-content: space-evenly;
 
   padding: 15px 10px;

@@ -4,7 +4,6 @@
   --color-primary: #7ad3fa;
   --color-primary-bold: #3c88fd;
   --color-primary-bolder: #0263e1;
-
   --color-button-green: #29c93f;
   --color-button-light-green: rgb(3 105 3 / 10%);
   --color-button-yellow: #ffbd2d;
@@ -17,7 +16,6 @@
   --color-text-lighter: #929292;
   --color-border: #a9a9a9;
   --color-border-light: #6868682e;
-
   --color-gradient-background: linear-gradient(
     360deg,
     #dee1e1 10%,
@@ -26,11 +24,14 @@
 
   --modal-shadow: 0px 4px 9px 0px #9e9e91;
   --modal-background: #e6e6e680;
+
   --button-shadow: 0 0 0.3px 0.3px #b2b2b2;
   --border-width: 0.5px;
   --button-height: 23px;
   --button-background: #f6f6f6;
   --button-border-radius: 3px;
+
+  --icon-size: 75px;
 }
 
 html,

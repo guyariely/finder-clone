@@ -11,6 +11,10 @@
     justify-self: center;
     font-size: 12px;
     text-align: center;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: var(--icon-size);
+    white-space: nowrap;
   }
 
   &.active {
@@ -30,13 +34,14 @@
 .icon-wrapper {
   border-radius: var(--button-border-radius);
   padding: 10px 2px 5px 2px;
+  margin-bottom: 2px;
 }
 
 .icon {
   background-size: contain;
   background-repeat: no-repeat;
-  width: 75px;
-  height: 65px;
+  width: var(--icon-size);
+  height: calc(var(--icon-size) - 10px);
 }
 
 .folder.icon {
