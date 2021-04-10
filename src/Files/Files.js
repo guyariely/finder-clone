@@ -21,10 +21,13 @@ class Files extends Component {
     this.setState({ activeFile: name, showContextMenu: false });
     // handle double click
     const { type } = this.props.files[name];
-    if (type === "folder" && this.state.lastClick) {
+    if (this.state.lastClick) {
       const timePassed = new Date().getTime() - this.state.lastClick;
       if (timePassed < 300) {
-        this.props.navigateToFolder(name);
+        type === "folder"
+          ? this.props.navigateToFolder(name)
+          : this.props.openTextEdit(name);
+
         this.setState({ activeFile: "" });
       }
     }

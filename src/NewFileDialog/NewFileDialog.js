@@ -1,5 +1,5 @@
 import { Component } from "react";
-import Dialog from "../Dialog/Dialog";
+import Modal from "../Modal/Modal";
 import DialogButton from "../DialogButton/DialogButton";
 import "./NewFileDialog.scss";
 
@@ -21,7 +21,7 @@ class NewFileDialog extends Component {
     const { modalIsOpen, closeModal, fileType, onClickCancel } = this.props;
 
     return (
-      <Dialog modalIsOpen={modalIsOpen} closeModal={closeModal}>
+      <Modal modalIsOpen={modalIsOpen} closeModal={closeModal}>
         <div className="new-file-dialog">
           <header className="toolbar">Create New File</header>
           <main className="dialog-body">
@@ -48,7 +48,7 @@ class NewFileDialog extends Component {
             </div>
           </main>
         </div>
-      </Dialog>
+      </Modal>
     );
   }
 }

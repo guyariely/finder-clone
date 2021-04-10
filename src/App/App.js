@@ -4,8 +4,9 @@ import SideBar from "../Sidebar/Sidebar";
 import Files from "../Files/Files";
 import StatusBar from "../StatusBar/StatusBar";
 import NewFileDialog from "../NewFileDialog/NewFileDialog";
+import TextEdit from "../TextEdit/TextEdit";
 import { last } from "../utils/utils";
-import { root } from "../dummy_files_object";
+import { root } from "../root";
 
 import "./App.scss";
 import "./mojave-wallpaper.jpg";
@@ -20,13 +21,19 @@ class App extends Component {
     this.createNewFile = this.createNewFile.bind(this);
     this.openNewFileDialog = this.openNewFileDialog.bind(this);
     this.navigateToFavorite = this.navigateToFavorite.bind(this);
+    this.openTextEdit = this.openTextEdit.bind(this);
+    this.saveChangesToFile = this.saveChangesToFile.bind(this);
+    this.closeTextEdit = this.closeTextEdit.bind(this);
 
     this.state = {
       searchInput: "",
       backwardHistory: [],
       forwardHistory: [],
-      modalIsOpen: false,
-      modalFileType: "folder",
+      newFileDialogOpen: false,
+      newFileDialogType: "folder",
+      textEditOpen: false,
+      textEditFileName: "",
+      textEditFileText: "",
     };
   }
 
@@ -49,6 +56,29 @@ class App extends Component {
         forwardHistory: [],
       };
     });
+  }
+
+  openTextEdit(name) {
+    const currentFolder = last(this.state.backwardHistory);
+    this.setState({
+      textEditOpen: true,
+      textEditFileName: name,
+      textEditFileText: currentFolder[name].text,
+    });
+  }
+
+  closeTextEdit() {
+    this.setState({ textEditOpen: false });
+  }
+
+  saveChangesToFile(text) {
+    this.setState({ textEditFileText: text });
+    const { backwardHistory, textEditFileName } = this.state;
+    const currentFolder = last(backwardHistory);
+
+    currentFolder[textEditFileName].text = text;
+
+    localStorage.setItem("files", JSON.stringify(backwardHistory[0]));
   }
 
   navigateBackward() {
@@ -75,10 +105,10 @@ class App extends Component {
     const { backwardHistory } = this.state;
     const currentFolder = last(backwardHistory);
 
-    if (this.state.modalFileType === "folder") {
-      currentFolder[name] = { name, type: "folder", files: {} };
+    if (this.state.newFileDialogType === "folder") {
+      currentFolder[name] = { type: "folder", files: {} };
     } else {
-      currentFolder[name] = { type: "textfile" };
+      currentFolder[name] = { type: "textfile", text: "" };
     }
 
     this.setState({
@@ -88,7 +118,7 @@ class App extends Component {
       ],
     });
 
-    this.setState({ modalIsOpen: false });
+    this.setState({ newFileDialogOpen: false });
     localStorage.setItem(
       "files",
       JSON.stringify(this.state.backwardHistory[0])
@@ -114,8 +144,8 @@ class App extends Component {
     // user should not be able to add files when searching files
     if (!this.state.searchInput) {
       this.setState({
-        modalIsOpen: true,
-        modalFileType: type,
+        newFileDialogOpen: true,
+        newFileDialogType: type,
       });
     }
   }
@@ -147,14 +177,19 @@ class App extends Component {
 
     const favorites = ["Home", "Documents", "Downloads", "Desktop"];
 
-    // console.log(currentFolder.directoryName);
-
     return (
       <div id="window">
+        <TextEdit
+          isModalOpen={this.state.textEditOpen}
+          text={this.state.textEditFileText}
+          name={this.state.textEditFileName}
+          saveChangesToFile={this.saveChangesToFile}
+          closeTextEdit={this.closeTextEdit}
+        />
         <NewFileDialog
-          modalIsOpen={this.state.modalIsOpen}
-          fileType={this.state.modalFileType}
-          onClickCancel={() => this.setState({ modalIsOpen: false })}
+          modalIsOpen={this.state.newFileDialogOpen}
+          fileType={this.state.newFileDialogType}
+          onClickCancel={() => this.setState({ newFileDialogOpen: false })}
           onClickSave={this.createNewFile}
         />
         <div id="finder">
@@ -169,11 +204,11 @@ class App extends Component {
           <SideBar
             favorites={favorites}
             navigateToFavorite={this.navigateToFavorite}
-            // currentFolderName={currentFolder.name}
           />
           <Files
             files={files}
             navigateToFolder={this.navigateToFolder}
+            openTextEdit={this.openTextEdit}
             openNewFileDialog={this.openNewFileDialog}
           />
           <StatusBar filesCount={filesCount} textFilesCount={textfilesCount} />

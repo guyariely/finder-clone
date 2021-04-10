@@ -13,7 +13,7 @@
     text-align: center;
     text-overflow: ellipsis;
     overflow: hidden;
-    width: var(--icon-size);
+    max-width: var(--icon-size);
     white-space: nowrap;
   }
 

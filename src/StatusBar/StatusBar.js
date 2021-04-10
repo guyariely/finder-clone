@@ -1,10 +1,8 @@
 import IconSizeSlider from "../IconSizeSlider/IconSizeSlider";
 import "./StatusBar.scss";
-import { getRandom } from "../utils/utils";
 
 function StatusBar({ filesCount, textFilesCount }) {
-  const randomSize = getRandom(0.15, 3);
-  const sizeTotal = Math.round(textFilesCount * randomSize * 100) / 100;
+  const sizeTotal = Math.round(textFilesCount * 0.75 * 100) / 100;
 
   return (
     <footer id="status-bar">
