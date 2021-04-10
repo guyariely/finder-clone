@@ -1,15 +1,19 @@
 import FavoriteFolder from "../FavoriteFolder/FavoriteFolder";
 import "./Sidebar.scss";
 
-function SideBar() {
+function SideBar({ favorites, navigateToFavorite, currentFolderName }) {
   return (
     <aside id="sidebar">
       <h5 className="favorites">Favorites</h5>
       <div className="favorites-folders">
-        <FavoriteFolder name="finderclone" />
-        <FavoriteFolder name="Documents" />
-        <FavoriteFolder name="Desktop" />
-        <FavoriteFolder name="Downloads" />
+        {favorites.map(favorite => (
+          <FavoriteFolder
+            navigateToFavorite={navigateToFavorite}
+            name={favorite}
+            key={favorite}
+            currentFolderName={currentFolderName}
+          />
+        ))}
       </div>
     </aside>
   );

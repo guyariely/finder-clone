@@ -1,10 +1,21 @@
 .favorites-folder {
+  display: flex;
+  align-items: flex-end;
   color: var(--color-text-soft);
   font-size: 14px;
-  padding: 1.5px 12px;
+  padding: 5px 12px;
+
+  &.active {
+    background: #0000001f;
+    color: var(--color-text);
+  }
 }
 
-.favorites-folder.active {
-  background: #0000001f;
-  color: var(--color-text);
+.favorites-folder-icon {
+  font-size: 16px;
+  margin-right: 5px;
+}
+
+.favorites-folder-name {
+  color: var(--color-text-soft);
 }

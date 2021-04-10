@@ -3,11 +3,9 @@ import MenuBar from "../MenuBar/MenuBar";
 import SideBar from "../Sidebar/Sidebar";
 import Files from "../Files/Files";
 import StatusBar from "../StatusBar/StatusBar";
-
-import { last } from "../utils/utils";
-
-import { files } from "../dummy_files_object";
 import NewFileDialog from "../NewFileDialog/NewFileDialog";
+import { last } from "../utils/utils";
+import { root } from "../dummy_files_object";
 
 import "./App.scss";
 import "./mojave-wallpaper.jpg";
@@ -21,6 +19,7 @@ class App extends Component {
     this.navigateForward = this.navigateForward.bind(this);
     this.createNewFile = this.createNewFile.bind(this);
     this.openNewFileDialog = this.openNewFileDialog.bind(this);
+    this.navigateToFavorite = this.navigateToFavorite.bind(this);
 
     this.state = {
       searchInput: "",
@@ -33,7 +32,7 @@ class App extends Component {
 
   componentDidMount() {
     const files = JSON.parse(localStorage.getItem("files"));
-    this.setState({ backwardHistory: [files] });
+    this.setState({ backwardHistory: [files || root] });
   }
 
   onSearchInputChange(e) {
@@ -77,7 +76,7 @@ class App extends Component {
     const currentFolder = last(backwardHistory);
 
     if (this.state.modalFileType === "folder") {
-      currentFolder[name] = { type: "folder", files: {} };
+      currentFolder[name] = { name, type: "folder", files: {} };
     } else {
       currentFolder[name] = { type: "textfile" };
     }
@@ -121,6 +120,18 @@ class App extends Component {
     }
   }
 
+  navigateToFavorite(folderName) {
+    const root = this.state.backwardHistory[0];
+    const homeDirectory = root["Home"];
+    const folder =
+      folderName === "Home" ? homeDirectory : homeDirectory.files[folderName];
+
+    this.setState(state => ({
+      backwardHistory: [...state.backwardHistory, folder.files],
+      forwardHistory: [],
+    }));
+  }
+
   render() {
     const currentFolder = last(this.state.backwardHistory);
     const files = this.state.searchInput
@@ -133,6 +144,10 @@ class App extends Component {
     const textfilesCount = filesNames.filter(
       fileName => files[fileName].type === "textfile"
     ).length;
+
+    const favorites = ["Home", "Documents", "Downloads", "Desktop"];
+
+    // console.log(currentFolder.directoryName);
 
     return (
       <div id="window">
@@ -151,7 +166,11 @@ class App extends Component {
             disableBackButton={this.state.backwardHistory.length <= 1}
             disableForwardButton={this.state.forwardHistory.length === 0}
           />
-          <SideBar />
+          <SideBar
+            favorites={favorites}
+            navigateToFavorite={this.navigateToFavorite}
+            // currentFolderName={currentFolder.name}
+          />
           <Files
             files={files}
             navigateToFolder={this.navigateToFolder}

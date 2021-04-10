@@ -45,4 +45,24 @@ const files = {
   },
 };
 
-export { files };
+const root = {
+  Home: {
+    type: "folder",
+    files: {
+      Documents: {
+        type: "folder",
+        files: {},
+      },
+      Desktop: {
+        type: "folder",
+        files: {},
+      },
+      Downloads: {
+        type: "folder",
+        files: {},
+      },
+    },
+  },
+};
+
+export { files, root };
