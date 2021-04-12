@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import MenuBar from "../MenuBar/MenuBar";
 import SideBar from "../Sidebar/Sidebar";
 import Files from "../Files/Files";
@@ -11,211 +11,177 @@ import { root } from "../root";
 import "./App.scss";
 import "./mojave-wallpaper.jpg";
 
-class App extends Component {
-  constructor(props) {
-    super(props);
-    this.onSearchInputChange = this.onSearchInputChange.bind(this);
-    this.navigateToFolder = this.navigateToFolder.bind(this);
-    this.navigateBackward = this.navigateBackward.bind(this);
-    this.navigateForward = this.navigateForward.bind(this);
-    this.createNewFile = this.createNewFile.bind(this);
-    this.openNewFileDialog = this.openNewFileDialog.bind(this);
-    this.navigateToFavorite = this.navigateToFavorite.bind(this);
-    this.openTextEdit = this.openTextEdit.bind(this);
-    this.saveChangesToFile = this.saveChangesToFile.bind(this);
-    this.closeTextEdit = this.closeTextEdit.bind(this);
+function App() {
+  const [searchInput, setSearchInput] = useState("");
+  const [backwardHistory, setBackwardHistory] = useState([]);
+  const [forwardHistory, setForwardHistory] = useState([]);
+  const [newFileDialogOpen, setNewFileDialogOpen] = useState(false);
+  const [newFileDialogType, setNewFileDialogType] = useState("folder");
+  const [textEditOpen, setTextEditOpen] = useState(false);
+  const [textEditFileName, setTextEditFileName] = useState("");
+  const [textEditFileText, setTextEditFileText] = useState("");
 
-    this.state = {
-      searchInput: "",
-      backwardHistory: [],
-      forwardHistory: [],
-      newFileDialogOpen: false,
-      newFileDialogType: "folder",
-      textEditOpen: false,
-      textEditFileName: "",
-      textEditFileText: "",
-    };
-  }
-
-  componentDidMount() {
+  useEffect(() => {
     const files = JSON.parse(localStorage.getItem("files"));
-    this.setState({ backwardHistory: [files || root] });
-  }
+    setBackwardHistory([files || root]);
+  }, []);
 
-  onSearchInputChange(e) {
+  function onSearchInputChange(e) {
     e.preventDefault();
-    this.setState({ searchInput: e.target.value });
+    setSearchInput(e.target.value);
   }
 
-  navigateToFolder(name) {
-    this.setState(state => {
-      const { backwardHistory } = state;
+  function navigateToFolder(name) {
+    setBackwardHistory(backwardHistory => {
       const currentFolder = last(backwardHistory);
-      return {
-        backwardHistory: [...backwardHistory, currentFolder[name].files],
-        forwardHistory: [],
-      };
+      return [...backwardHistory, currentFolder[name].files];
     });
+    setForwardHistory([]);
   }
 
-  openTextEdit(name) {
-    const currentFolder = last(this.state.backwardHistory);
-    this.setState({
-      textEditOpen: true,
-      textEditFileName: name,
-      textEditFileText: currentFolder[name].text,
-    });
-  }
-
-  closeTextEdit() {
-    this.setState({ textEditOpen: false });
-  }
-
-  saveChangesToFile(text) {
-    this.setState({ textEditFileText: text });
-    const { backwardHistory, textEditFileName } = this.state;
+  function openTextEdit(name) {
     const currentFolder = last(backwardHistory);
+    const files = searchInput ? getSearchedFiles(currentFolder) : currentFolder;
+    setTextEditOpen(true);
+    setTextEditFileName(name);
+    setTextEditFileText(files[name].text);
+  }
 
-    currentFolder[textEditFileName].text = text;
+  function closeTextEdit() {
+    setTextEditOpen(false);
+  }
 
+  function saveChangesToFile(text) {
+    setTextEditFileText(text);
+
+    const currentFolder = last(backwardHistory);
+    const files = searchInput ? getSearchedFiles(currentFolder) : currentFolder;
+
+    files[textEditFileName].text = text;
     localStorage.setItem("files", JSON.stringify(backwardHistory[0]));
   }
 
-  navigateBackward() {
-    this.setState(state => {
-      const { backwardHistory, forwardHistory } = state;
-      return {
-        backwardHistory: backwardHistory.slice(0, backwardHistory.length - 1),
-        forwardHistory: [...forwardHistory, last(backwardHistory)],
-      };
+  function navigateBackward() {
+    setBackwardHistory(backwardHistory => {
+      setForwardHistory(forwardHistory => [
+        ...forwardHistory,
+        last(backwardHistory),
+      ]);
+      return backwardHistory.slice(0, backwardHistory.length - 1);
     });
   }
 
-  navigateForward() {
-    this.setState(state => {
-      const { backwardHistory, forwardHistory } = state;
-      return {
-        forwardHistory: forwardHistory.slice(0, forwardHistory.length - 1),
-        backwardHistory: [...backwardHistory, last(forwardHistory)],
-      };
+  function navigateForward() {
+    setForwardHistory(forwardHistory => {
+      setBackwardHistory(backwardHistory => [
+        ...backwardHistory,
+        last(forwardHistory),
+      ]);
+      return forwardHistory.slice(0, forwardHistory.length - 1);
     });
   }
 
-  createNewFile(name) {
-    const { backwardHistory } = this.state;
+  function createNewFile(name) {
     const currentFolder = last(backwardHistory);
 
-    if (this.state.newFileDialogType === "folder") {
+    if (newFileDialogType === "folder") {
       currentFolder[name] = { type: "folder", files: {} };
     } else {
       currentFolder[name] = { type: "textfile", text: "" };
     }
 
-    this.setState({
-      backwardHistory: [
-        ...backwardHistory.slice(0, backwardHistory.length - 1),
-        currentFolder,
-      ],
-    });
+    setBackwardHistory(backwardHistory => [
+      ...backwardHistory.slice(0, backwardHistory.length - 1),
+      currentFolder,
+    ]);
 
-    this.setState({ newFileDialogOpen: false });
-    localStorage.setItem(
-      "files",
-      JSON.stringify(this.state.backwardHistory[0])
-    );
+    setNewFileDialogOpen(false);
+    localStorage.setItem("files", JSON.stringify(backwardHistory[0]));
   }
 
-  getSearchedFiles(folder) {
+  function getSearchedFiles(folder) {
     let files = {};
     for (const fileName in folder) {
       if (
         folder[fileName].type === "textfile" &&
-        fileName.toLowerCase().includes(this.state.searchInput.toLowerCase())
+        fileName.toLowerCase().includes(searchInput.toLowerCase())
       ) {
         files[fileName] = folder[fileName];
       } else {
-        files = { ...files, ...this.getSearchedFiles(folder[fileName].files) };
+        files = { ...files, ...getSearchedFiles(folder[fileName].files) };
       }
     }
     return files;
   }
 
-  openNewFileDialog(type) {
+  function openNewFileDialog(type) {
     // user should not be able to add files when searching files
-    if (!this.state.searchInput) {
-      this.setState({
-        newFileDialogOpen: true,
-        newFileDialogType: type,
-      });
+    if (!searchInput) {
+      setNewFileDialogOpen(true);
+      setNewFileDialogType(type);
     }
   }
 
-  navigateToFavorite(folderName) {
-    const root = this.state.backwardHistory[0];
+  function navigateToFavorite(folderName) {
+    const root = backwardHistory[0];
     const homeDirectory = root["Home"];
     const folder =
       folderName === "Home" ? homeDirectory : homeDirectory.files[folderName];
 
-    this.setState(state => ({
-      backwardHistory: [...state.backwardHistory, folder.files],
-      forwardHistory: [],
-    }));
+    setBackwardHistory(backwardHistory => [...backwardHistory, folder.files]);
+    setForwardHistory([]);
   }
 
-  render() {
-    const currentFolder = last(this.state.backwardHistory);
-    const files = this.state.searchInput
-      ? this.getSearchedFiles(currentFolder)
-      : currentFolder;
+  const currentFolder = last(backwardHistory);
+  const files = searchInput ? getSearchedFiles(currentFolder) : currentFolder;
 
-    const filesNames = Object.keys(files || {});
+  const filesNames = Object.keys(files || {});
 
-    const filesCount = filesNames.length;
-    const textfilesCount = filesNames.filter(
-      fileName => files[fileName].type === "textfile"
-    ).length;
+  const filesCount = filesNames.length;
+  const textfilesCount = filesNames.filter(
+    fileName => files[fileName].type === "textfile"
+  ).length;
 
-    const favorites = ["Home", "Documents", "Downloads", "Desktop"];
+  const favorites = ["Home", "Documents", "Downloads", "Desktop"];
 
-    return (
-      <div id="window">
-        <TextEdit
-          isModalOpen={this.state.textEditOpen}
-          text={this.state.textEditFileText}
-          name={this.state.textEditFileName}
-          saveChangesToFile={this.saveChangesToFile}
-          closeTextEdit={this.closeTextEdit}
+  return (
+    <div id="window">
+      <TextEdit
+        isModalOpen={textEditOpen}
+        text={textEditFileText}
+        name={textEditFileName}
+        saveChangesToFile={name => saveChangesToFile(name)}
+        closeTextEdit={() => closeTextEdit()}
+      />
+      <NewFileDialog
+        modalIsOpen={newFileDialogOpen}
+        fileType={newFileDialogType}
+        onClickCancel={() => setNewFileDialogOpen(false)}
+        onClickSave={name => createNewFile(name)}
+      />
+      <div id="finder">
+        <MenuBar
+          searchInput={searchInput}
+          onSearchInputChange={e => onSearchInputChange(e)}
+          navigateBackward={() => navigateBackward()}
+          navigateForward={() => navigateForward()}
+          disableBackButton={backwardHistory.length <= 1}
+          disableForwardButton={forwardHistory.length === 0}
         />
-        <NewFileDialog
-          modalIsOpen={this.state.newFileDialogOpen}
-          fileType={this.state.newFileDialogType}
-          onClickCancel={() => this.setState({ newFileDialogOpen: false })}
-          onClickSave={this.createNewFile}
+        <SideBar
+          favorites={favorites}
+          navigateToFavorite={folderName => navigateToFavorite(folderName)}
         />
-        <div id="finder">
-          <MenuBar
-            searchInput={this.state.searchInput}
-            onSearchInputChange={this.onSearchInputChange}
-            navigateBackward={this.navigateBackward}
-            navigateForward={this.navigateForward}
-            disableBackButton={this.state.backwardHistory.length <= 1}
-            disableForwardButton={this.state.forwardHistory.length === 0}
-          />
-          <SideBar
-            favorites={favorites}
-            navigateToFavorite={this.navigateToFavorite}
-          />
-          <Files
-            files={files}
-            navigateToFolder={this.navigateToFolder}
-            openTextEdit={this.openTextEdit}
-            openNewFileDialog={this.openNewFileDialog}
-          />
-          <StatusBar filesCount={filesCount} textFilesCount={textfilesCount} />
-        </div>
+        <Files
+          files={files}
+          navigateToFolder={name => navigateToFolder(name)}
+          openTextEdit={name => openTextEdit(name)}
+          openNewFileDialog={type => openNewFileDialog(type)}
+        />
+        <StatusBar filesCount={filesCount} textFilesCount={textfilesCount} />
       </div>
-    );
-  }
+    </div>
+  );
 }
 
 export default App;

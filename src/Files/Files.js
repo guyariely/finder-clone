@@ -1,91 +1,85 @@
-import { Component } from "react";
+import { useState } from "react";
 import File from "../File/File";
 import "./Files.scss";
 import ContextMenu from "../ContextMenu/ContextMenu";
 
-class Files extends Component {
-  constructor(props) {
-    super(props);
-    this.onClickFile = this.onClickFile.bind(this);
-    this.openNewFileDialog = this.openNewFileDialog.bind(this);
-    this.state = {
-      activeFile: "",
-      lastClick: null,
-      showContextMenu: false,
-      contextMenuPosition: { x: null, y: null },
-    };
-  }
+function Files(props) {
+  const [activeFile, setActiveFile] = useState("");
+  const [lastClick, setLastClick] = useState(null);
+  const [showContextMenu, setShowContextMenu] = useState(false);
+  const [contextMenuPosition, setContextMenuPosition] = useState({
+    x: null,
+    y: null,
+  });
 
-  onClickFile(e, name) {
+  function onClickFile(e, name) {
     e.preventDefault();
-    this.setState({ activeFile: name, showContextMenu: false });
+    setActiveFile(name);
+    setShowContextMenu(false);
     // handle double click
-    const { type } = this.props.files[name];
-    if (this.state.lastClick) {
-      const timePassed = new Date().getTime() - this.state.lastClick;
+    const { type } = props.files[name];
+    if (lastClick) {
+      const timePassed = new Date().getTime() - lastClick;
       if (timePassed < 300) {
         type === "folder"
-          ? this.props.navigateToFolder(name)
-          : this.props.openTextEdit(name);
+          ? props.navigateToFolder(name)
+          : props.openTextEdit(name);
 
-        this.setState({ activeFile: "" });
+        setActiveFile("");
       }
     }
     // register current click time
-    this.setState({ lastClick: new Date().getTime() });
+    setLastClick(new Date().getTime());
   }
 
-  onClickScreen(e) {
+  function onClickScreen(e) {
     e.preventDefault();
     if (e.target.id === "files") {
-      this.setState({ activeFile: "", showContextMenu: false });
+      setActiveFile("");
+      setShowContextMenu(false);
     }
   }
 
-  onRightClickScreen(e) {
+  function onRightClickScreen(e) {
     e.preventDefault();
     if (e.target.id === "files") {
-      this.setState({
-        showContextMenu: true,
-        contextMenuPosition: { x: e.pageX, y: e.pageY },
-      });
+      setShowContextMenu(true);
+      setContextMenuPosition({ x: e.pageX, y: e.pageY });
     }
   }
 
-  openNewFileDialog(type) {
-    this.setState({ showContextMenu: false });
-    this.props.openNewFileDialog(type);
+  function openNewFileDialog(type) {
+    setShowContextMenu(false);
+    props.openNewFileDialog(type);
   }
 
-  render() {
-    const { files } = this.props;
+  const { files } = props;
 
-    return (
-      <main
-        id="files"
-        onClick={e => this.onClickScreen(e)}
-        onContextMenu={e => this.onRightClickScreen(e)}
-      >
-        {this.state.showContextMenu && (
-          <ContextMenu
-            xPos={this.state.contextMenuPosition.x}
-            yPos={this.state.contextMenuPosition.y}
-            openNewFileDialog={this.openNewFileDialog}
+  return (
+    <main
+      id="files"
+      onClick={e => onClickScreen(e)}
+      onContextMenu={e => onRightClickScreen(e)}
+    >
+      {showContextMenu && (
+        <ContextMenu
+          xPos={contextMenuPosition.x}
+          yPos={contextMenuPosition.y}
+          openNewFileDialog={type => openNewFileDialog(type)}
+        />
+      )}
+      {files &&
+        Object.keys(files).map(fileName => (
+          <File
+            isActive={fileName === activeFile}
+            onClickFile={e => onClickFile(e, fileName)}
+            key={fileName}
+            name={fileName}
+            type={files[fileName].type}
           />
-        )}
-        {files &&
-          Object.keys(files).map(fileName => (
-            <File
-              isActive={fileName === this.state.activeFile}
-              onClickFile={this.onClickFile}
-              key={fileName}
-              name={fileName}
-              type={files[fileName].type}
-            />
-          ))}
-      </main>
-    );
-  }
+        ))}
+    </main>
+  );
 }
 
 export default Files;
