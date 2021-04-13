@@ -1,47 +1,31 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { useFormInput, useHistoryStack } from "../Hooks/hooks";
 import MenuBar from "../MenuBar/MenuBar";
 import SideBar from "../Sidebar/Sidebar";
 import Files from "../Files/Files";
 import StatusBar from "../StatusBar/StatusBar";
 import NewFileDialog from "../NewFileDialog/NewFileDialog";
 import TextEdit from "../TextEdit/TextEdit";
-import { last } from "../utils/utils";
-import { root } from "../root";
 
 import "./App.scss";
 import "./mojave-wallpaper.jpg";
 
 function App() {
-  const [searchInput, setSearchInput] = useState("");
-  const [backwardHistory, setBackwardHistory] = useState([]);
-  const [forwardHistory, setForwardHistory] = useState([]);
+  const searchInput = useFormInput("");
+  const historyStack = useHistoryStack();
+
   const [newFileDialogOpen, setNewFileDialogOpen] = useState(false);
   const [newFileDialogType, setNewFileDialogType] = useState("folder");
   const [textEditOpen, setTextEditOpen] = useState(false);
   const [textEditFileName, setTextEditFileName] = useState("");
   const [textEditFileText, setTextEditFileText] = useState("");
 
-  useEffect(() => {
-    const files = JSON.parse(localStorage.getItem("files"));
-    setBackwardHistory([files || root]);
-  }, []);
-
-  function onSearchInputChange(e) {
-    e.preventDefault();
-    setSearchInput(e.target.value);
-  }
-
-  function navigateToFolder(name) {
-    setBackwardHistory(backwardHistory => {
-      const currentFolder = last(backwardHistory);
-      return [...backwardHistory, currentFolder[name].files];
-    });
-    setForwardHistory([]);
-  }
-
   function openTextEdit(name) {
-    const currentFolder = last(backwardHistory);
-    const files = searchInput ? getSearchedFiles(currentFolder) : currentFolder;
+    const currentFolder = historyStack.currentFolder();
+    const files = searchInput.value
+      ? getSearchedFiles(currentFolder)
+      : currentFolder;
+
     setTextEditOpen(true);
     setTextEditFileName(name);
     setTextEditFileText(files[name].text);
@@ -54,35 +38,16 @@ function App() {
   function saveChangesToFile(text) {
     setTextEditFileText(text);
 
-    const currentFolder = last(backwardHistory);
-    const files = searchInput ? getSearchedFiles(currentFolder) : currentFolder;
+    const files = searchInput.value
+      ? getSearchedFiles(currentFolder)
+      : historyStack.currentFolder();
 
     files[textEditFileName].text = text;
-    localStorage.setItem("files", JSON.stringify(backwardHistory[0]));
-  }
-
-  function navigateBackward() {
-    setBackwardHistory(backwardHistory => {
-      setForwardHistory(forwardHistory => [
-        ...forwardHistory,
-        last(backwardHistory),
-      ]);
-      return backwardHistory.slice(0, backwardHistory.length - 1);
-    });
-  }
-
-  function navigateForward() {
-    setForwardHistory(forwardHistory => {
-      setBackwardHistory(backwardHistory => [
-        ...backwardHistory,
-        last(forwardHistory),
-      ]);
-      return forwardHistory.slice(0, forwardHistory.length - 1);
-    });
+    localStorage.setItem("files", JSON.stringify(historyStack.root()));
   }
 
   function createNewFile(name) {
-    const currentFolder = last(backwardHistory);
+    const currentFolder = historyStack.currentFolder();
 
     if (newFileDialogType === "folder") {
       currentFolder[name] = { type: "folder", files: {} };
@@ -90,13 +55,10 @@ function App() {
       currentFolder[name] = { type: "textfile", text: "" };
     }
 
-    setBackwardHistory(backwardHistory => [
-      ...backwardHistory.slice(0, backwardHistory.length - 1),
-      currentFolder,
-    ]);
+    historyStack.updateCurrentFolder(currentFolder);
 
     setNewFileDialogOpen(false);
-    localStorage.setItem("files", JSON.stringify(backwardHistory[0]));
+    localStorage.setItem("files", JSON.stringify(historyStack.root()));
   }
 
   function getSearchedFiles(folder) {
@@ -104,7 +66,7 @@ function App() {
     for (const fileName in folder) {
       if (
         folder[fileName].type === "textfile" &&
-        fileName.toLowerCase().includes(searchInput.toLowerCase())
+        fileName.toLowerCase().includes(searchInput.value.toLowerCase())
       ) {
         files[fileName] = folder[fileName];
       } else {
@@ -115,25 +77,16 @@ function App() {
   }
 
   function openNewFileDialog(type) {
-    // user should not be able to add files when searching files
-    if (!searchInput) {
+    if (!searchInput.value) {
       setNewFileDialogOpen(true);
       setNewFileDialogType(type);
     }
   }
 
-  function navigateToFavorite(folderName) {
-    const root = backwardHistory[0];
-    const homeDirectory = root["Home"];
-    const folder =
-      folderName === "Home" ? homeDirectory : homeDirectory.files[folderName];
-
-    setBackwardHistory(backwardHistory => [...backwardHistory, folder.files]);
-    setForwardHistory([]);
-  }
-
-  const currentFolder = last(backwardHistory);
-  const files = searchInput ? getSearchedFiles(currentFolder) : currentFolder;
+  const currentFolder = historyStack.currentFolder();
+  const files = searchInput.value
+    ? getSearchedFiles(currentFolder)
+    : currentFolder;
 
   const filesNames = Object.keys(files || {});
 
@@ -161,20 +114,22 @@ function App() {
       />
       <div id="finder">
         <MenuBar
-          searchInput={searchInput}
-          onSearchInputChange={e => onSearchInputChange(e)}
-          navigateBackward={() => navigateBackward()}
-          navigateForward={() => navigateForward()}
-          disableBackButton={backwardHistory.length <= 1}
-          disableForwardButton={forwardHistory.length === 0}
+          searchInput={searchInput.value}
+          onSearchInputChange={e => searchInput.onChange(e)}
+          navigateBackward={() => historyStack.navigateBackward()}
+          navigateForward={() => historyStack.navigateForward()}
+          disableBackButton={historyStack.backwardHistory.length <= 1}
+          disableForwardButton={historyStack.forwardHistory.length === 0}
         />
         <SideBar
           favorites={favorites}
-          navigateToFavorite={folderName => navigateToFavorite(folderName)}
+          navigateToFavorite={folderName =>
+            historyStack.navigateToFavorite(folderName)
+          }
         />
         <Files
           files={files}
-          navigateToFolder={name => navigateToFolder(name)}
+          navigateToFolder={name => historyStack.navigateToFolder(name)}
           openTextEdit={name => openTextEdit(name)}
           openNewFileDialog={type => openNewFileDialog(type)}
         />

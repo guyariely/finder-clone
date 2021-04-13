@@ -1,70 +1,54 @@
 import { useState } from "react";
+import { useDoubleClick, useContextMenu } from "../Hooks/hooks";
 import File from "../File/File";
-import "./Files.scss";
 import ContextMenu from "../ContextMenu/ContextMenu";
+import "./Files.scss";
 
 function Files(props) {
   const [activeFile, setActiveFile] = useState("");
-  const [lastClick, setLastClick] = useState(null);
-  const [showContextMenu, setShowContextMenu] = useState(false);
-  const [contextMenuPosition, setContextMenuPosition] = useState({
-    x: null,
-    y: null,
-  });
+  const [isFileDoubleClick, registerFileClick] = useDoubleClick(300);
+  const contextMenu = useContextMenu("files");
+
+  const { files, navigateToFolder, openTextEdit } = props;
 
   function onClickFile(e, name) {
     e.preventDefault();
     setActiveFile(name);
-    setShowContextMenu(false);
-    // handle double click
-    const { type } = props.files[name];
-    if (lastClick) {
-      const timePassed = new Date().getTime() - lastClick;
-      if (timePassed < 300) {
-        type === "folder"
-          ? props.navigateToFolder(name)
-          : props.openTextEdit(name);
+    contextMenu.close();
 
-        setActiveFile("");
-      }
+    const type = files[name].type;
+    if (isFileDoubleClick()) {
+      type === "folder" ? navigateToFolder(name) : openTextEdit(name);
+      setActiveFile("");
     }
-    // register current click time
-    setLastClick(new Date().getTime());
+
+    registerFileClick();
   }
 
   function onClickScreen(e) {
     e.preventDefault();
     if (e.target.id === "files") {
       setActiveFile("");
-      setShowContextMenu(false);
-    }
-  }
-
-  function onRightClickScreen(e) {
-    e.preventDefault();
-    if (e.target.id === "files") {
-      setShowContextMenu(true);
-      setContextMenuPosition({ x: e.pageX, y: e.pageY });
+      contextMenu.close();
     }
   }
 
   function openNewFileDialog(type) {
-    setShowContextMenu(false);
+    contextMenu.close();
     props.openNewFileDialog(type);
   }
-
-  const { files } = props;
 
   return (
     <main
       id="files"
       onClick={e => onClickScreen(e)}
-      onContextMenu={e => onRightClickScreen(e)}
+      onContextMenu={e => contextMenu.open(e)}
+      name="files"
     >
-      {showContextMenu && (
+      {contextMenu.isOpen && (
         <ContextMenu
-          xPos={contextMenuPosition.x}
-          yPos={contextMenuPosition.y}
+          xPos={contextMenu.position.x}
+          yPos={contextMenu.position.y}
           openNewFileDialog={type => openNewFileDialog(type)}
         />
       )}
