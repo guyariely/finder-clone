@@ -1,10 +1,12 @@
 # macOS finder clone built with react
 
+[live demo](https://finder-clone.netlify.app/)
+
 ## currently the clone supports:
 
 1. creating folders
 2. creating text files and editing them
-3. searching for all text files in the root directory
+3. searching for text files
 4. resizing file icons
 
 ## some screenshots:

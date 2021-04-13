@@ -40,7 +40,7 @@
 }
 
 .window-control.minimize-window {
-  @include window-control-button(yellow);
+  @include window-control-button(orange);
 }
 
 .window-control.maximize-window {
