@@ -1,6 +1,4 @@
 import "./File.scss";
-import "./folder.png";
-import "./textfile.png";
 
 function File({ name, type, isActive, onClickFile }) {
   return (
